@@ -85,6 +85,14 @@ export function IntegratedChat({ mode, onModeChange, selectedSource }: Integrate
     }
   }, [mode, hasSpokenWelcome, currentMessages.length])
 
+  // Функция для добавления сообщений в чат
+  const addMessageToChat = (message: any, chatMode: "text" | "voice" | "video" = mode) => {
+    setChatHistory((prev) => ({
+      ...prev,
+      [chatMode]: [...prev[chatMode], message],
+    }))
+  }
+
   // Обработчик для текстового чата
   const handleTextInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTextInput(e.target.value)
@@ -101,10 +109,7 @@ export function IntegratedChat({ mode, onModeChange, selectedSource }: Integrate
     }
 
     // Добавляем сообщение в историю ТЕКСТОВОГО чата
-    setChatHistory((prev) => ({
-      ...prev,
-      text: [...prev.text, userMessage],
-    }))
+    addMessageToChat(userMessage, "text")
 
     setTextInput("")
     setIsTextLoading(true)
@@ -128,10 +133,7 @@ export function IntegratedChat({ mode, onModeChange, selectedSource }: Integrate
       }
 
       // Добавляем ответ в историю ТЕКСТОВОГО чата
-      setChatHistory((prev) => ({
-        ...prev,
-        text: [...prev.text, assistantMessage],
-      }))
+      addMessageToChat(assistantMessage, "text")
     } catch (error) {
       console.error("Text chat error:", error)
       const errorMessage = {
@@ -139,10 +141,7 @@ export function IntegratedChat({ mode, onModeChange, selectedSource }: Integrate
         role: "assistant",
         content: "Извините, произошла ошибка. Попробуйте еще раз.",
       }
-      setChatHistory((prev) => ({
-        ...prev,
-        text: [...prev.text, errorMessage],
-      }))
+      addMessageToChat(errorMessage, "text")
     } finally {
       setIsTextLoading(false)
     }
@@ -158,12 +157,7 @@ export function IntegratedChat({ mode, onModeChange, selectedSource }: Integrate
       content: voiceText.trim(),
     }
 
-    // Добавляем сообщение в историю ГОЛОСОВОГО чата
-    setChatHistory((prev) => ({
-      ...prev,
-      voice: [...prev.voice, userMessage],
-    }))
-
+    addMessageToChat(userMessage, "voice")
     setIsVoiceLoading(true)
 
     try {
@@ -184,11 +178,7 @@ export function IntegratedChat({ mode, onModeChange, selectedSource }: Integrate
         content: data.content,
       }
 
-      // Добавляем ответ в историю ГОЛОСОВОГО чата
-      setChatHistory((prev) => ({
-        ...prev,
-        voice: [...prev.voice, assistantMessage],
-      }))
+      addMessageToChat(assistantMessage, "voice")
     } catch (error) {
       console.error("Voice chat error:", error)
       const errorMessage = {
@@ -196,10 +186,7 @@ export function IntegratedChat({ mode, onModeChange, selectedSource }: Integrate
         role: "assistant",
         content: "Извините, произошла ошибка. Попробуйте еще раз.",
       }
-      setChatHistory((prev) => ({
-        ...prev,
-        voice: [...prev.voice, errorMessage],
-      }))
+      addMessageToChat(errorMessage, "voice")
     } finally {
       setIsVoiceLoading(false)
     }
@@ -215,12 +202,7 @@ export function IntegratedChat({ mode, onModeChange, selectedSource }: Integrate
       content: videoText.trim(),
     }
 
-    // Добавляем сообщение в историю ВИДЕО чата
-    setChatHistory((prev) => ({
-      ...prev,
-      video: [...prev.video, userMessage],
-    }))
-
+    addMessageToChat(userMessage, "video")
     setIsVideoLoading(true)
 
     try {
@@ -241,11 +223,7 @@ export function IntegratedChat({ mode, onModeChange, selectedSource }: Integrate
         content: data.content,
       }
 
-      // Добавляем ответ в историю ВИДЕО чата
-      setChatHistory((prev) => ({
-        ...prev,
-        video: [...prev.video, assistantMessage],
-      }))
+      addMessageToChat(assistantMessage, "video")
     } catch (error) {
       console.error("Video chat error:", error)
       const errorMessage = {
@@ -253,10 +231,7 @@ export function IntegratedChat({ mode, onModeChange, selectedSource }: Integrate
         role: "assistant",
         content: "Извините, произошла ошибка. Попробуйте еще раз.",
       }
-      setChatHistory((prev) => ({
-        ...prev,
-        video: [...prev.video, errorMessage],
-      }))
+      addMessageToChat(errorMessage, "video")
     } finally {
       setIsVideoLoading(false)
     }
@@ -357,6 +332,8 @@ export function IntegratedChat({ mode, onModeChange, selectedSource }: Integrate
                 handleSubmit={handleTextSubmit}
                 isLoading={isTextLoading}
                 setInput={setTextInput}
+                selectedSource={selectedSource}
+                onAddMessage={(message) => addMessageToChat(message, "text")}
               />
             ) : (
               <VoiceChatInterface

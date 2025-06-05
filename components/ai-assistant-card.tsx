@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect, useRef } from "react"
-import { MessageSquare, Video, Phone, X, Play, HelpCircle } from "lucide-react"
+import { MessageSquare, Video, Phone, X, Play, HelpCircle, Volume2 } from "lucide-react"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -71,15 +71,18 @@ export function AIAssistantCard({ onOpenChat, onCloseChat, isChatActive = false 
 
   const handleManualPlay = () => {
     if (videoRef.current) {
-      videoRef.current.muted = false // Включаем звук при ручном запуске
-      videoRef.current
-        .play()
-        .then(() => {
-          setShowPlayButton(false)
-        })
-        .catch((error) => {
-          console.log("Ошибка при ручном запуске видео:", error)
-        })
+      // Сначала перематываем видео на начало
+      videoRef.current.currentTime = 0
+      
+      // Включаем звук
+      videoRef.current.muted = false
+      
+      // Запускаем воспроизведение
+      videoRef.current.play().then(() => {
+        setShowPlayButton(false)
+      }).catch((error) => {
+        console.log("Ошибка при ручном запуске видео:", error)
+      })
     }
   }
 
@@ -227,7 +230,20 @@ export function AIAssistantCard({ onOpenChat, onCloseChat, isChatActive = false 
                     onClick={handleManualPlay}
                     className="bg-blue-500 hover:bg-blue-600 text-white rounded-full w-16 h-16 flex items-center justify-center"
                   >
-                    <Play className="h-8 w-8" />
+                    {/* <Play className="h-8 w-8" /> */}
+                    <motion.div
+        animate={{ 
+          scale: [1, 1.2, 1],
+          opacity: [0.8, 1, 0.8]
+        }}
+        transition={{ 
+          duration: 1.5, 
+          repeat: Infinity 
+        }}
+      >
+                    <Volume2 className="h-8 w-8" />
+
+      </motion.div>
                   </Button>
                 </div>
               )}
